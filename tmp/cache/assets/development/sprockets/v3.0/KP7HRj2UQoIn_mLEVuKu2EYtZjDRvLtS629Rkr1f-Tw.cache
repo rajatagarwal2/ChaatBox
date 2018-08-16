@@ -1,0 +1,57 @@
+I"(function() {
+  $(document).on("page:change", function() {
+    $('.js-product').click(function(e) {
+      var id, price, quantity;
+      $(".details").slideUp();
+      $("#line-items").show();
+      $(".js-proceed").show();
+      $(".please-select").hide();
+      $('.subarea').slideUp();
+      $("#minorder").hide();
+      id = $(this).attr('id');
+      if ($(this).hasClass('js-product-selected')) {
+        price = $(this).find('.js-product-price').html();
+        quantity = $('#num' + id).val();
+        $('.finish-message').slideUp();
+        $('#total').html($('#total').html() - (quantity * price));
+        $('#line-items #tag' + id).remove();
+        $(this).removeClass('js-product-selected');
+        $(this).find('.js-product-details').removeClass('bg-green');
+        $("#name-input").val("");
+        $("#mobile-input").val("");
+        $("#email-input").val("");
+        $("#address-input").val("");
+        return $.ajax('remove_line_item_from_order', {
+          type: "POST",
+          dataType: "JSON",
+          data: $.param({
+            line_item: {
+              product_id: id
+            }
+          })
+        });
+      } else {
+        $('#line-items').append($('#line-item-container').html());
+        $(this).addClass('js-product-selected');
+        $(this).addClass('over');
+        $(this).find('.js-product-details').addClass('bg-green');
+        $('.finish-message').slideUp();
+        $("#name-input").val("");
+        $("#mobile-input").val("");
+        $("#email-input").val("");
+        $("#address-input").val("");
+        $.ajax('add_line_item_to_order', {
+          type: "POST",
+          dataType: "JSON",
+          data: $.param({
+            line_item: {
+              product_id: id
+            }
+          })
+        });
+      }
+    });
+  });
+
+}).call(this);
+:ET
